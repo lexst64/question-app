@@ -49,7 +49,7 @@ export class Question {
 function renderAllQuestions(questions) {
     if (questions) {
         const keys = Object.keys(questions)
-        const html = keys.length > 0
+        const html = keys.length
             ? keys.map((key) => {
                 return createQuestionHTML({ ...questions[key], id: key })
             }).join('')
@@ -82,5 +82,5 @@ function getQuestionsFromLocalStorage() {
     if (jsonItem) {
         return JSON.parse(jsonItem)
     }
-    return JSON.parse('[]')
+    return []
 }

@@ -1,4 +1,10 @@
-import { isValidValue, createModal, createLoadingModal } from './utils'
+import {
+    isValidValue,
+    createModal,
+    createLoadingModal,
+    validateEmail,
+    validatePassword,
+} from './utils'
 import { Question } from './question'
 import { getAuthForm, authWithEmailAndPassword } from './auth'
 import { MyComponent } from './components/MyComponent'
@@ -23,8 +29,8 @@ const submitFormHandler = (event) => {
             text: input.value.trim(),
             date: new Date().toJSON(),
         }
+        submit.disabled = true
         Question.create(question).then(() => {
-            submit.disabled = true
             input.value = ''
             input.className = ''
         })
@@ -35,17 +41,28 @@ const inputHandler = () => {
     submit.disabled = !isValidValue(input.value)
 }
 
-const authFormHandler = (event) => {
+const authFormHandler = (event, email, password) => {
     event.preventDefault()
-    const form = event.target
-    const email = form.querySelector('#email-input').value
-    const password = form.querySelector('#password-input').value
     authWithEmailAndPassword(email, password)
-        .then(response => {
+        .then((response) => {
             createLoadingModal()
             return Question.fetch(response)
         })
-        .then(html => createModal({content: html}))
+        .then((html) => createModal({ content: html }))
+}
+
+const authEmailHandler = (event, btnEl) => {
+    if (validateEmail(event.target.value)) {
+        return (btnEl.disabled = false)
+    }
+    return (btnEl.disabled = true)
+}
+
+const authPasswordHandler = (event, btnEl) => {
+    if (validatePassword(event.target.value)) {
+        return (btnEl.disabled = false)
+    }
+    return (btnEl.disabled = true)
 }
 
 form.addEventListener('submit', submitFormHandler)
@@ -55,7 +72,22 @@ seeAllBtn.addEventListener('click', () => {
         title: 'Log-in',
         content: `${getAuthForm()}`,
     })
-    document
-        .getElementById('auth-form')
-        .addEventListener('submit', authFormHandler, { once: true })
+    const form = document.getElementById('auth-form')
+    const emailInput = form.querySelector('#email-input')
+    const passwordInput = form.querySelector('#password-input')
+    const btn = form.querySelector('#auth-submit')
+
+    emailInput.addEventListener('input', (event) =>
+        authEmailHandler(event, btn)
+    )
+    passwordInput.addEventListener('input', (event) =>
+        authPasswordHandler(event, btn)
+    )
+    form.addEventListener(
+        'submit',
+        (event) => {
+            authFormHandler(event, emailInput.value, passwordInput.value)
+        },
+        { once: true }
+    )
 })
