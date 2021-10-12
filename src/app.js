@@ -3,8 +3,8 @@ import { Question } from './question'
 import { getAuthForm, authWithEmailAndPassword } from './auth'
 import { MyComponent } from './components/MyComponent'
 import { MyButton } from './components/MyButton'
-import './app.css'
-import './loading.css'
+import './style/app.css'
+import './style/loading.css'
 
 const form = document.getElementById('question-form')
 const input = form.querySelector('#question-input')
